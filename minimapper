@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ "$1" == "-h" ] ; then
+    echo "Usage: minimapper <reference.fasta> <in.fasta> <out_prefix(will be .sorted.bam)>"
+    exit 0
+fi
+
+if [ "$1" == "--help" ] ; then
+    echo "Usage: minimapper <reference.fasta> <in.fasta> <out_prefix(will be .sorted.bam)>"
+    exit 0
+fi
+
+
+echo "Executing Minimap2 for $2 "
+minimap2 -x map-ont -a $1 $2 > $3.sam
+echo "Done with Minimap2, executing conversion from .sam to .bam "
+samtools view -b -o $3.bam $3.sam
+echo "Sorting .bam "
+samtools sort -o $3.sorted.bam $3.bam
+samtools index $3.sorted.bam
+exit 0
