@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [ "$1" == "-h" ] ; then
+        echo "Usage: cnvnator <path/to/working/directory (i.e. cnvnator working directory, with a "reference" sub-directory containing the reference, and separate sub-directories for each strain's sequencing reads/.bam file)> <window_size> <path/to/reads/directory (e.g. UK48, assumes you are currently in /working/directory/)> <prefix (e.g. snps, reads_to_reference, etc. Assume followed by .bam)>"
+        exit 0
+fi
+
+if [ "$1" == "--help" ] ; then
+        echo "Usage: cnvnator <path/to/working/directory (i.e. cnvnator working directory, with a "reference" sub-directory containing the reference, and separate sub-directories for each strain's sequencing reads/.bam file)> <window_size> <path/to/reads/directory (e.g. UK48, assumes you are currently in /working/directory/)> <prefix (e.g. snps, reads_to_reference, etc. Assume followed by .bam)>"
+
+        exit 0
+fi
+
+sudo docker run -v $1:/data wwliao/cnvnator cnvnator -unique -root $3/out.root -tree $3/$4.bam
+sudo docker run -v $1:/data wwliao/cnvnator cnvnator -root $3/out.root -his $2 -d reference
+sudo docker run -v $1:/data wwliao/cnvnator cnvnator -root $3/out.root -stat $2
+sudo docker run -v $1:/data wwliao/cnvnator cnvnator -root $3/out.root -partition $2
+sudo docker run -v $1:/data wwliao/cnvnator cnvnator -root $3/out.root  -eval $2 >> $3/golden_ratio.txt
+
+sudo docker run -v $1:/data wwliao/cnvnator cnvnator -root $3/out.root -call $2 >$3/CNVnator_out.$2.txt
